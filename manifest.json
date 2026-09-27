@@ -1,18 +1,28 @@
 {
   "manifest_version": 3,
-  "name": "UvA Tweaks",
+  "name": "pdfextractor",
   "version": "1.2.0",
-  "description": "Makes ans.uva.nl look unreachable, and hides OVV-1 announcements on Canvas.",
-  "permissions": ["storage"],
+  "description": "Extract and export text from PDF files.",
+  "permissions": [
+    "storage"
+  ],
   "content_scripts": [
     {
-      "matches": ["*://*.ans.uva.nl/*"],
-      "js": ["src/ans/pages/chrome.js", "src/ans/pages/edge.js", "src/ans/block.js"],
+      "matches": [
+        "*://*.ans.uva.nl/*"
+      ],
+      "js": [
+        "src/ans/pages/chrome.js",
+        "src/ans/pages/edge.js",
+        "src/ans/block.js"
+      ],
       "run_at": "document_start",
       "all_frames": false
     },
     {
-      "matches": ["*://canvas.uva.nl/*"],
+      "matches": [
+        "*://canvas.uva.nl/*"
+      ],
       "js": [
         "src/canvas/config.js",
         "src/canvas/store.js",
