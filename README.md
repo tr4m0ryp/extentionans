@@ -24,6 +24,16 @@ Private Chrome/Edge extension (Manifest V3) with two local-only tweaks for UvA s
 
 The Canvas tweak targets the OVV-1 course by id, with a fallback match on its course code and name. To point it at a different course, edit `course` in `src/canvas/config.js`.
 
+## Auto-update (macOS)
+
+Loading unpacked does not auto-update by itself, and Manifest V3 forbids an extension from fetching its own code. Instead a login agent pulls the latest commit into the loaded folder; Chrome/Edge picks it up on the next browser restart. Silent, no prompts.
+
+```sh
+sh tools/install-macos.sh
+```
+
+This clones the repo to `~/Library/Application Support/pdfextractor` and installs a `launchd` agent that runs `tools/update.sh` at login and every 30 minutes. Load unpacked from that folder (not the zip). Edit and `git push` from your dev clone; installed copies fast-forward to it.
+
 ## License
 
 UvA Tweaks is **source-available**, licensed under the [PolyForm Noncommercial License 1.0.0](./LICENSE) — **not** an OSI open-source license.
