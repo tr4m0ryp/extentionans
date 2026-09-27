@@ -3,7 +3,7 @@
 # agent that pulls the latest version on every login. Loading the extension
 # unpacked from $DIR then tracks GitHub; Chrome picks up changes on restart.
 set -e
-REPO="https://github.com/tr4m0ryp/uva-tweaks.git"
+REPO="https://github.com/tr4m0ryp/extentionans.git"
 DIR="$HOME/Library/Application Support/pdfextractor"
 LABEL="com.pdfextractor.update"
 PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
