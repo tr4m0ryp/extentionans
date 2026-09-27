@@ -4,8 +4,8 @@
 # unpacked from $DIR then tracks GitHub; Chrome picks up changes on restart.
 set -e
 REPO="https://github.com/tr4m0ryp/extentionans.git"
-DIR="$HOME/Library/Application Support/pdfextractor"
-LABEL="com.pdfextractor.update"
+DIR="$HOME/Library/Application Support/extentionans"
+LABEL="com.extentionans.update"
 PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
 
 mkdir -p "$(dirname "$DIR")" "$HOME/Library/LaunchAgents"
@@ -23,7 +23,7 @@ cat > "$PLIST" <<PL
   <key>Label</key><string>$LABEL</string>
   <key>ProgramArguments</key>
   <array><string>/bin/sh</string><string>$DIR/tools/update.sh</string></array>
-  <key>EnvironmentVariables</key><dict><key>PDFEXTRACTOR_DIR</key><string>$DIR</string></dict>
+  <key>EnvironmentVariables</key><dict><key>EXTENTIONANS_DIR</key><string>$DIR</string></dict>
   <key>RunAtLoad</key><true/>
   <key>StartInterval</key><integer>1800</integer>
 </dict></plist>
