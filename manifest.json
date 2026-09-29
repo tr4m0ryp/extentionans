@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "pdfextention",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Extract and export text from PDF files.",
   "permissions": [
     "storage"
@@ -31,6 +31,7 @@
         "src/canvas/home.js",
         "src/canvas/index_page.js",
         "src/canvas/topic.js",
+        "src/canvas/discussions.js",
         "src/canvas/main.js"
       ],
       "run_at": "document_start",

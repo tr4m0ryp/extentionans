@@ -25,12 +25,14 @@ CanvasHide.runTopic = function (tid) {
   };
 
   (async () => {
-    const [allow, annIds] = await Promise.all([
+    const [allow, annIds, discIds] = await Promise.all([
       store.get(keys.allow),
       store.get(keys.annIds),
+      store.get(keys.discIds),
     ]);
-    // true / false, or null when the lookup failed.
-    const isAnn = annIds.includes(tid) || (await api.isAnnouncement(tid));
+    // true / false, or null when the lookup failed. Cached ids skip the fetch.
+    const isAnn =
+      annIds.includes(tid) || (discIds.includes(tid) ? false : await api.isAnnouncement(tid));
     if (isAnn !== false && allow.includes(tid)) return reveal();
     return block(
       isAnn === false

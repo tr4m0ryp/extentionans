@@ -1,9 +1,13 @@
 // Entry point (runs last). Confirms the page belongs to the OVV-1 course, injects
-// the pre-paint hiding CSS, then routes to the handler for the current page.
+// the pre-paint hiding CSS, then routes to the handler for the current page. The
+// Discussions section is blocked entirely: its pages redirect, its links hide.
 (function () {
   const H = globalThis.CanvasHide;
   const { course, css, injectStyle, topicId } = H;
   const path = location.pathname;
+
+  // This course's Discussions entries on every page, the dashboard included.
+  injectStyle(css.global);
 
   const urlId = (path.match(/\/courses\/(\d+)/) || [])[1];
   if (!urlId) return;
@@ -29,6 +33,7 @@
     }
     injectStyle(sheet);
 
+    H.runDiscussionLinks();
     if (isTopic && tid) H.runTopic(tid);
     else if (isIndex) H.runIndex();
     else H.runHome();
