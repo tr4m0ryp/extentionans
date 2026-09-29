@@ -27,14 +27,15 @@ CanvasHide.api = (function () {
         return null;
       }
     },
-    // Whether a single topic is an announcement (used when the cache is cold).
+    // Whether a single topic is an announcement (used when the id is not cached).
+    // null means unknown (request failed), so callers can decide how to fail.
     async isAnnouncement(topicId) {
       const id = CanvasHide.course.id;
       try {
         const t = await json(`/api/v1/courses/${id}/discussion_topics/${topicId}`);
         return !!t.is_announcement;
       } catch (_) {
-        return false;
+        return null;
       }
     },
   };
