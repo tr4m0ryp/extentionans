@@ -22,8 +22,6 @@ CanvasHide.css = (function () {
   ` + hide(
     s.discNav,
     `:is(${s.discIndexLink})`,
-    // A wiki table row that exists only to point at the forum (no nested table).
-    `tr:has(> td :is(${s.discIndexLink})):not(:has(table))`,
     s.discModuleItem,
     s.discAssignment,
     s.discTodo,
