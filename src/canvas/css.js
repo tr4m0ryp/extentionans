@@ -5,11 +5,30 @@ var CanvasHide = globalThis.CanvasHide || (globalThis.CanvasHide = {});
 
 CanvasHide.css = (function () {
   const s = CanvasHide.sel;
-  // Always-on for the matched course: home block + left-nav tab.
+  const inCourse = `a[href*='/courses/${CanvasHide.course.id}/']`;
+  // One rule per selector: an unsupported selector then drops only its own rule.
+  const hide = (...list) => list.map((x) => `${x} { display: none !important; }`).join("\n");
+
+  // Every Canvas page (dashboard included): this course's Discussions entries.
+  const global = hide(
+    `${s.discCard}${inCourse.slice(1)}`,
+    `${s.discTodo}:has(${inCourse})`
+  );
+  // Always-on for the matched course: home block, Announcements and Discussions
+  // tabs, and every link or row that leads into the Discussions section.
   const base = `
     ${s.recentBlock} { display: none !important; }
     #section-tabs li:has(${s.navTab}) { display: none !important; }
-  `;
+  ` + hide(
+    s.discNav,
+    `:is(${s.discIndexLink})`,
+    // A wiki table row that exists only to point at the forum (no nested table).
+    `tr:has(> td :is(${s.discIndexLink})):not(:has(table))`,
+    s.discModuleItem,
+    s.discAssignment,
+    s.discTodo,
+    ".cvh-hide"
+  );
   // Announcements index: hide every row; only rows we mark .cvh-show appear.
   const index = `
     ${s.annRow}:not(.cvh-show) { display: none !important; }
@@ -23,7 +42,7 @@ CanvasHide.css = (function () {
   const leaving = `
     ${s.content} { visibility: hidden !important; }
   `;
-  return { base, index, topic, leaving };
+  return { global, base, index, topic, leaving };
 })();
 
 CanvasHide.injectStyle = function (cssText) {
