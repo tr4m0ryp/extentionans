@@ -1,5 +1,5 @@
-// Refreshes the cached set of all announcement ids for the course, and looks up
-// a single topic's announcement flag. Same-origin fetches send the Canvas
+// Refreshes the cached announcement and discussion ids for the course, and looks
+// up a single topic's announcement flag. Same-origin fetches send the Canvas
 // session cookie automatically. Canvas may prefix JSON with an anti-JSON guard.
 var CanvasHide = globalThis.CanvasHide || (globalThis.CanvasHide = {});
 
@@ -12,21 +12,25 @@ CanvasHide.api = (function () {
     return parse(await r.text());
   }
 
+  // Refreshes one cached id list from the course topics endpoint. Without
+  // only_announcements, Canvas returns plain discussions only.
+  async function refreshIds(query, key) {
+    const id = CanvasHide.course.id;
+    try {
+      const list = await json(`/api/v1/courses/${id}/discussion_topics?${query}per_page=100`);
+      const ids = list.map((a) => String(a.id));
+      await CanvasHide.store.set(key, ids);
+      return ids;
+    } catch (_) {
+      return null;
+    }
+  }
+
   return {
     // All announcement ids in the course, refreshed into storage.
-    async refreshAnnouncementIds() {
-      const id = CanvasHide.course.id;
-      try {
-        const list = await json(
-          `/api/v1/courses/${id}/discussion_topics?only_announcements=true&per_page=100`
-        );
-        const ids = list.map((a) => String(a.id));
-        await CanvasHide.store.set(CanvasHide.keys.annIds, ids);
-        return ids;
-      } catch (_) {
-        return null;
-      }
-    },
+    refreshAnnouncementIds: () => refreshIds("only_announcements=true&", CanvasHide.keys.annIds),
+    // All discussion ids in the course, refreshed into storage.
+    refreshDiscussionIds: () => refreshIds("", CanvasHide.keys.discIds),
     // Whether a single topic is an announcement (used when the id is not cached).
     // null means unknown (request failed), so callers can decide how to fail.
     async isAnnouncement(topicId) {
