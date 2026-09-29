@@ -5,14 +5,14 @@ var CanvasHide = globalThis.CanvasHide || (globalThis.CanvasHide = {});
 
 CanvasHide.css = (function () {
   const s = CanvasHide.sel;
-  const inCourse = `a[href*='/courses/${CanvasHide.course.id}/']`;
+  const courseHref = `[href*='/courses/${CanvasHide.course.id}/']`;
   // One rule per selector: an unsupported selector then drops only its own rule.
   const hide = (...list) => list.map((x) => `${x} { display: none !important; }`).join("\n");
 
   // Every Canvas page (dashboard included): this course's Discussions entries.
   const global = hide(
-    `${s.discCard}${inCourse.slice(1)}`,
-    `${s.discTodo}:has(${inCourse})`
+    s.discCard + courseHref,
+    `${s.discTodo}:has(a${courseHref})`
   );
   // Always-on for the matched course: home block, Announcements and Discussions
   // tabs, and every link or row that leads into the Discussions section.
