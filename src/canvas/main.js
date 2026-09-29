@@ -9,11 +9,19 @@
   if (!urlId) return;
 
   const isTopic = /\/courses\/\d+\/discussion_topics\/\d+/.test(path);
+  // Discussions index (and /new etc.): the whole section is blocked.
+  const isDiscussions = !isTopic && /\/courses\/\d+\/discussion_topics(\/|$)/.test(path);
   const isIndex = /\/courses\/\d+\/announcements\/?$/.test(path);
   const tid = topicId(path);
 
   const apply = () => {
-    // Base hiding (home block + nav tab) applies on every course page.
+    // Leave the Discussions section before anything paints, back to the course
+    // home, the way Canvas treats a section that is switched off.
+    if (isDiscussions) {
+      injectStyle(css.base + css.leaving);
+      return location.replace(`/courses/${urlId}`);
+    }
+    // Base hiding (home block, nav tabs, discussion links) on every course page.
     let sheet = css.base + (isIndex ? css.index : "");
     if (isTopic && tid) {
       document.documentElement.setAttribute("data-cvh-topic", "pending");

@@ -19,7 +19,11 @@ CanvasHide.css = (function () {
   const topic = `
     html[data-cvh-topic="pending"] ${s.content} { visibility: hidden !important; }
   `;
-  return { base, index, topic };
+  // Discussions section: hidden while we redirect away from it.
+  const leaving = `
+    ${s.content} { visibility: hidden !important; }
+  `;
+  return { base, index, topic, leaving };
 })();
 
 CanvasHide.injectStyle = function (cssText) {

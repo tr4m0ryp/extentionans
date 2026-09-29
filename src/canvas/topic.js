@@ -1,7 +1,8 @@
 // A single discussion/announcement page (/courses/<id>/discussion_topics/<tid>).
 // Content is held invisible by CSS (data-cvh-topic="pending", set before paint).
-// We reveal it unless it is an announcement that is not in the allow-set, in
-// which case it is blocked and never shown. Normal discussions always reveal.
+// Only an announcement that is in the allow-set is revealed. Everything else is
+// blocked and never shown: announcements outside the To-do list, and every
+// normal discussion, since the Discussions section is blocked entirely.
 var CanvasHide = globalThis.CanvasHide || (globalThis.CanvasHide = {});
 
 CanvasHide.runTopic = function (tid) {
@@ -10,7 +11,7 @@ CanvasHide.runTopic = function (tid) {
 
   const reveal = () => root.setAttribute("data-cvh-topic", "ok");
 
-  const block = () => {
+  const block = (text) => {
     root.setAttribute("data-cvh-topic", "blocked");
     const show = () => {
       const c = document.querySelector(sel.content);
@@ -18,7 +19,7 @@ CanvasHide.runTopic = function (tid) {
       c.style.visibility = "visible";
       c.innerHTML =
         '<div style="max-width:640px;margin:15vh auto;text-align:center;color:#6b7780;' +
-        'font:16px system-ui,\'Segoe UI\',sans-serif">Deze aankondiging is niet beschikbaar.</div>';
+        "font:16px system-ui,'Segoe UI',sans-serif\">" + text + "</div>";
     };
     show();
   };
@@ -28,11 +29,13 @@ CanvasHide.runTopic = function (tid) {
       store.get(keys.allow),
       store.get(keys.annIds),
     ]);
-    if (allow.includes(tid)) return reveal();
-
-    // Not allowed: block only if it is actually an announcement.
-    let isAnn = annIds.includes(tid);
-    if (!isAnn && annIds.length === 0) isAnn = await api.isAnnouncement(tid);
-    return isAnn ? block() : reveal();
+    // true / false, or null when the lookup failed.
+    const isAnn = annIds.includes(tid) || (await api.isAnnouncement(tid));
+    if (isAnn !== false && allow.includes(tid)) return reveal();
+    return block(
+      isAnn === false
+        ? "Deze discussie is niet beschikbaar."
+        : "Deze aankondiging is niet beschikbaar."
+    );
   })();
 };
