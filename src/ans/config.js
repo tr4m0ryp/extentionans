@@ -10,9 +10,11 @@ AnsHide.rules = {
   courses: [
     { id: "695168", textRe: /5062STRE6Y|Statistisch Redeneren/i }, // Statistisch Redeneren
   ],
-  // Single assignments hidden everywhere, results included.
+  // Single assignments hidden everywhere, results included. Today's RAT is
+  // both the individual (iRAT) and team (tRAT) test; match either, any cohort,
+  // and tolerate the date written as 03-11-2026 or "3 Nov(ember) 2026".
   assignments: [
-    /\biRAT\b.*03-11-2026/i, // WDD-1 iRAT of 3 Nov 2026, every cohort
+    /\b[it]RAT\b[\s\S]*?(?:03-11-2026|3\s+nov\w*\.?,?\s*2026)/i,
   ],
 };
 
