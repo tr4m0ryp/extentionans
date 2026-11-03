@@ -33,26 +33,30 @@ CanvasHide.marks.runPage = function (course, route) {
 };
 
 // Recent feedback (dashboard and course sidebars): reveal only allowed items
-// of each frozen course. Starts once the list exists, so pages without it make
-// no API request.
+// of each frozen course. Canvas renders the list after load, so each course's
+// handler starts the first time one of its items appears; pages without it
+// make no API request.
 CanvasHide.marks.runFeedback = function (courses) {
   const { assignmentId, courseHref } = CanvasHide;
-  const start = () => {
-    courses.forEach((course) => {
-      const items = `.recent_feedback li:has(a${courseHref(course)})`;
-      if (!document.querySelector(items)) return;
-      CanvasHide.marks.policy.watch(course, (allow) => {
-        document.querySelectorAll(items).forEach((li) => {
-          const link = li.querySelector("a[href*='/assignments/']");
-          const id = assignmentId(link && link.getAttribute("href"));
-          li.classList.toggle("cvh-show", !!id && allow.has(id));
-        });
+  const pending = courses.map((course) => ({
+    course,
+    items: `.recent_feedback li:has(a${courseHref(course)})`,
+  }));
+  const start = ({ course, items }) =>
+    CanvasHide.marks.policy.watch(course, (allow) => {
+      document.querySelectorAll(items).forEach((li) => {
+        const link = li.querySelector("a[href*='/assignments/']");
+        const id = assignmentId(link && link.getAttribute("href"));
+        li.classList.toggle("cvh-show", !!id && allow.has(id));
       });
     });
+  const check = () => {
+    for (let i = pending.length - 1; i >= 0; i--) {
+      if (document.querySelector(pending[i].items)) start(pending.splice(i, 1)[0]);
+    }
+    if (!pending.length) seen.disconnect();
   };
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", start, { once: true });
-  } else {
-    start();
-  }
+  const seen = new MutationObserver(check);
+  seen.observe(document.documentElement, { childList: true, subtree: true });
+  check();
 };
