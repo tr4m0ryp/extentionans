@@ -34,15 +34,6 @@
     return true;
   };
 
-  // Turbo keeps a blocked page from being left mid-swap: re-arm after a visit.
-  document.addEventListener("turbo:load", () => {
-    if (!H.blockedPath(location.pathname)) {
-      leaving = false;
-      root.removeAttribute("data-ans-leaving");
-    }
-    guard();
-  });
-
   if (guard()) return;
   H.items.scan(root);
   new MutationObserver((records) => {
