@@ -3,23 +3,30 @@
 // never by un-hiding after a visible delay.
 var CanvasHide = globalThis.CanvasHide || (globalThis.CanvasHide = {});
 
-CanvasHide.css = (function () {
-  const s = CanvasHide.sel;
-  const courseHref = `[href*='/courses/${CanvasHide.course.id}/']`;
-  // One rule per selector: an unsupported selector then drops only its own rule.
-  const hide = (...list) => list.map((x) => `${x} { display: none !important; }`).join("\n");
+// One rule per selector: an unsupported selector then drops only its own rule.
+CanvasHide.hideRules = (...list) => list.map((x) => `${x} { display: none !important; }`).join("\n");
+CanvasHide.courseHref = (course) => `[href*='/courses/${course.id}/']`;
 
-  // Every Canvas page (dashboard included): this course's Discussions entries.
-  const global = hide(
-    s.discCard + courseHref,
-    `${s.discTodo}:has(a${courseHref})`
-  );
-  // Always-on for the matched course: home block, Announcements and Discussions
-  // tabs, and every link or row that leads into the Discussions section.
+// Every Canvas page (dashboard included): each course's Discussions entries.
+CanvasHide.globalCss = function (courses) {
+  const s = CanvasHide.sel;
+  return courses
+    .map((c) => {
+      const href = CanvasHide.courseHref(c);
+      return CanvasHide.hideRules(s.discCard + href, `${s.discTodo}:has(a${href})`);
+    })
+    .join("\n");
+};
+
+// Sheets for pages inside the matched course.
+CanvasHide.buildCss = function () {
+  const s = CanvasHide.sel;
+  // Always-on: home block, Announcements and Discussions tabs, and every link
+  // or row that leads into the Discussions section.
   const base = `
     ${s.recentBlock} { display: none !important; }
     #section-tabs li:has(${s.navTab}) { display: none !important; }
-  ` + hide(
+  ` + CanvasHide.hideRules(
     s.discNav,
     `:is(${s.discIndexLink})`,
     s.discModuleItem,
@@ -40,8 +47,8 @@ CanvasHide.css = (function () {
   const leaving = `
     ${s.content} { visibility: hidden !important; }
   `;
-  return { global, base, index, topic, leaving };
-})();
+  return { base, index, topic, leaving };
+};
 
 CanvasHide.injectStyle = function (cssText) {
   const style = document.createElement("style");
