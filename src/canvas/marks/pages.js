@@ -29,10 +29,10 @@ CanvasHide.marks.runAssignment = function (course, aid) {
 CanvasHide.marks.runSubmission = function (course, aid) {
   const root = document.documentElement;
   const block = () => {
-    root.setAttribute("data-cvh-marks", "blocked");
     const c = document.querySelector(CanvasHide.sel.content);
     if (!c || document.readyState === "loading")
       return document.addEventListener("DOMContentLoaded", block, { once: true });
+    root.setAttribute("data-cvh-marks", "blocked");
     c.style.visibility = "visible";
     c.innerHTML =
       '<div style="max-width:640px;margin:15vh auto;text-align:center;color:#6b7780;' +
