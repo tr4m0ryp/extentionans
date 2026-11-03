@@ -1,13 +1,19 @@
-// Entry point (runs last). Confirms the page belongs to the OVV-1 course, injects
-// the pre-paint hiding CSS, then routes to the handler for the current page. The
-// Discussions section is blocked entirely: its pages redirect, its links hide.
+// Entry point (runs last). Resolves which governed course the page belongs to,
+// injects the pre-paint hiding CSS, then routes to the handlers for the page.
+// Every course: announcements hidden outside the To-do list, the Discussions
+// section blocked (pages redirect, links hide). A course with `marks` also
+// gets the marks freeze.
 (function () {
   const H = globalThis.CanvasHide;
-  const { course, css, injectStyle, topicId } = H;
+  const { courses, injectStyle, topicId } = H;
+  const M = H.marks;
+  const frozen = courses.filter((c) => c.marks);
   const path = location.pathname;
 
-  // This course's Discussions entries on every page, the dashboard included.
-  injectStyle(css.global);
+  // Each course's Discussions entries and frozen marks on every page, the
+  // dashboard included.
+  injectStyle(H.globalCss(courses) + M.css.global(frozen));
+  M.runFeedback(frozen);
 
   const urlId = (path.match(/\/courses\/(\d+)/) || [])[1];
   if (!urlId) return;
@@ -18,7 +24,9 @@
   const isIndex = /\/courses\/\d+\/announcements\/?$/.test(path);
   const tid = topicId(path);
 
-  const apply = () => {
+  const apply = (course) => {
+    H.useCourse(course);
+    const css = H.buildCss();
     // Leave the Discussions section before anything paints, back to the course
     // home, the way Canvas treats a section that is switched off.
     if (isDiscussions) {
@@ -31,22 +39,29 @@
       document.documentElement.setAttribute("data-cvh-topic", "pending");
       sheet += css.topic;
     }
+    const marks = course.marks ? M.route(path) : null;
+    sheet += M.pageCss(marks);
     injectStyle(sheet);
 
     H.runDiscussionLinks();
+    M.runPage(course, marks);
     if (isTopic && tid) H.runTopic(tid);
     else if (isIndex) H.runIndex();
     else H.runHome();
   };
 
   // Fast path: known course id, act immediately with no DOM dependency.
-  if (urlId === course.id) return apply();
+  const known = courses.find((c) => c.id === urlId);
+  if (known) return apply(known);
 
-  // Different id: confirm this really is OVV-1 by its unique code (or name)
-  // before touching anything. Needs the body text, so wait for it.
+  // Unknown id: identify the course by its unique code (or name) in the page
+  // title and breadcrumbs before touching anything. Not the whole body, which
+  // lists other courses too (course menus, grade dropdowns). Needs the DOM.
   const confirm = () => {
-    const t = document.body ? document.body.textContent : "";
-    if (course.codeRe.test(t) || course.nameRe.test(t)) apply();
+    const crumbs = document.querySelector("#breadcrumbs, .ic-app-crumbs");
+    const t = document.title + " " + (crumbs ? crumbs.textContent : "");
+    const course = courses.find((c) => c.codeRe.test(t) || c.nameRe.test(t));
+    if (course) apply(course);
   };
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", confirm, { once: true });
