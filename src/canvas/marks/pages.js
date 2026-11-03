@@ -25,26 +25,19 @@ CanvasHide.marks.runAssignment = function (course, aid) {
 };
 
 // Submission details page: content held until decided; a frozen mark is
-// replaced by a notice. A later refresh can only reveal, never re-hide, since
-// the page content is already gone once blocked.
+// replaced by a notice.
 CanvasHide.marks.runSubmission = function (course, aid) {
   const root = document.documentElement;
-  let blocked = false;
   const block = () => {
-    if (blocked) return;
+    root.setAttribute("data-cvh-marks", "blocked");
     const c = document.querySelector(CanvasHide.sel.content);
-    if (!c) return;
-    blocked = true;
+    if (!c) return document.addEventListener("DOMContentLoaded", block, { once: true });
     c.style.visibility = "visible";
     c.innerHTML =
       '<div style="max-width:640px;margin:15vh auto;text-align:center;color:#6b7780;' +
       "font:16px system-ui,'Segoe UI',sans-serif\">Dit cijfer is niet beschikbaar.</div>";
   };
-  CanvasHide.marks.policy.watch(course, (allow) => {
-    if (blocked) return;
-    if (allow.has(aid)) return root.setAttribute("data-cvh-marks", "ok");
-    // Wait for the first full decision before blocking: the cache read and
-    // the refresh both trigger apply, so only block once the page is parsed.
-    if (document.readyState !== "loading") block();
-  });
+  CanvasHide.marks.policy
+    .allows(course, aid)
+    .then((ok) => (ok ? root.setAttribute("data-cvh-marks", "ok") : block()));
 };
