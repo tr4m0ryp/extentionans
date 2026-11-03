@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "pdfextention",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Extract and export text from PDF files.",
   "permissions": [
     "storage"
