@@ -11,12 +11,14 @@ CanvasHide.runTopic = function (tid) {
 
   const reveal = () => root.setAttribute("data-cvh-topic", "ok");
 
+  // Content stays hidden ("pending") until the whole page is parsed, so the
+  // parser cannot append real content after the notice replaced it.
   const block = (text) => {
-    root.setAttribute("data-cvh-topic", "blocked");
     const show = () => {
       const c = document.querySelector(sel.content);
       if (!c || document.readyState === "loading")
-      return document.addEventListener("DOMContentLoaded", show, { once: true });
+        return document.addEventListener("DOMContentLoaded", show, { once: true });
+      root.setAttribute("data-cvh-topic", "blocked");
       c.style.visibility = "visible";
       c.innerHTML =
         '<div style="max-width:640px;margin:15vh auto;text-align:center;color:#6b7780;' +
