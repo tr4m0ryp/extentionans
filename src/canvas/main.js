@@ -61,7 +61,8 @@
     const crumbs = document.querySelector("#breadcrumbs, .ic-app-crumbs");
     const t = document.title + " " + (crumbs ? crumbs.textContent : "");
     const course = courses.find((c) => c.codeRe.test(t) || c.nameRe.test(t));
-    if (course) apply(course);
+    // Use the live id, so API calls and storage keys follow the new course.
+    if (course) apply({ ...course, id: urlId });
   };
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", confirm, { once: true });
