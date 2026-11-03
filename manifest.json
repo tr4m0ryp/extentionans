@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "pdfextention",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Extract and export text from PDF files.",
   "permissions": [
     "storage"
@@ -14,6 +14,7 @@
       "js": [
         "src/ans/config.js",
         "src/ans/items.js",
+        "src/ans/password.js",
         "src/ans/main.js"
       ],
       "run_at": "document_start",
