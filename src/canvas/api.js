@@ -1,7 +1,6 @@
 // Same-origin Canvas API access: refreshes the cached announcement and
-// discussion ids for the course, and looks
-// up a single topic's announcement flag. Same-origin fetches send the Canvas
-// session cookie automatically. Canvas may prefix JSON with an anti-JSON guard.
+// discussion ids for the course, and looks up a single topic's announcement
+// flag. Same-origin fetches send the Canvas session cookie automatically. Canvas may prefix JSON with an anti-JSON guard.
 var CanvasHide = globalThis.CanvasHide || (globalThis.CanvasHide = {});
 
 CanvasHide.api = (function () {
