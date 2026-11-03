@@ -31,7 +31,8 @@ CanvasHide.marks.runSubmission = function (course, aid) {
   const block = () => {
     root.setAttribute("data-cvh-marks", "blocked");
     const c = document.querySelector(CanvasHide.sel.content);
-    if (!c) return document.addEventListener("DOMContentLoaded", block, { once: true });
+    if (!c || document.readyState === "loading")
+      return document.addEventListener("DOMContentLoaded", block, { once: true });
     c.style.visibility = "visible";
     c.innerHTML =
       '<div style="max-width:640px;margin:15vh auto;text-align:center;color:#6b7780;' +

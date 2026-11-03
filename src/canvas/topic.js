@@ -15,7 +15,8 @@ CanvasHide.runTopic = function (tid) {
     root.setAttribute("data-cvh-topic", "blocked");
     const show = () => {
       const c = document.querySelector(sel.content);
-      if (!c) return document.addEventListener("DOMContentLoaded", show, { once: true });
+      if (!c || document.readyState === "loading")
+      return document.addEventListener("DOMContentLoaded", show, { once: true });
       c.style.visibility = "visible";
       c.innerHTML =
         '<div style="max-width:640px;margin:15vh auto;text-align:center;color:#6b7780;' +
