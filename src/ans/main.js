@@ -36,11 +36,14 @@
 
   if (guard()) return;
   H.items.scan(root);
+  H.password.enable(root);
   new MutationObserver((records) => {
     if (guard()) return;
     for (const r of records) {
       if (r.type === "characterData") H.items.scan(r.target);
       else r.addedNodes.forEach((n) => H.items.scan(n));
     }
+    // ANS re-renders the Security form via Turbo frames; re-enable each time.
+    H.password.enable(root);
   }).observe(root, { childList: true, subtree: true, characterData: true });
 })();
