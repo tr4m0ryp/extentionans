@@ -27,6 +27,7 @@ CanvasHide.api = (function () {
   }
 
   return {
+    json,
     // All announcement ids in the course, refreshed into storage.
     refreshAnnouncementIds: () => refreshIds("only_announcements=true&", CanvasHide.keys.annIds),
     // All discussion ids in the course, refreshed into storage.
