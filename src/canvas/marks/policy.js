@@ -55,5 +55,13 @@ CanvasHide.marks.policy = (function () {
     run();
   }
 
-  return { isOpenGroup, watch };
+  // One-shot decision for a single assignment: cache first, then the API.
+  async function allows(course, aid) {
+    const cached = await H.store.get(H.keysFor(course).marksAllow);
+    if (frozen(course).includes(aid) || cached.includes(aid)) return true;
+    const ids = await refresh(course);
+    return !!ids && ids.includes(aid);
+  }
+
+  return { isOpenGroup, watch, allows };
 })();
